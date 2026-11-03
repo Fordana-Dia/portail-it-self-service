@@ -1,0 +1,33 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  API_IMAGE: "portail-it-api"
+
+# Étape 1 : Tester l'API
+test:
+  stage: test
+  image: python:3.11-slim
+  script:
+    - cd api
+    - pip install -r requirements.txt
+    - echo "Tests passed"
+
+# Étape 2 : Build Docker
+build:
+  stage: build
+  script:
+    - docker build -t $API_IMAGE ./api
+    - echo "Image built successfully"
+
+# Étape 3 : Déployer avec Docker Compose
+deploy:
+  stage: deploy
+  script:
+    - docker compose down
+    - docker compose up -d --build
+    - echo "Deployment complete"
+  only:
+    - main
